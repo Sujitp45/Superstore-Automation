@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import io
 import json
 import os
-from google.oauth2.credentials import Credentials
+from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import numpy as np
@@ -10,7 +10,12 @@ import pandas as pd
 
 # Fetch credentials and File ID from GitHub Secrets
 token_info = json.loads(os.environ['GDRIVE_TOKEN'])
-creds = Credentials.from_authorized_user_info(token_info)
+
+# Service Account credentials वापरा:
+creds = Credentials.from_service_account_info(
+    token_info, scopes=['https://www.googleapis.com/auth/drive.file']
+)
+
 service = build('drive', 'v3', credentials=creds)
 FILE_ID = os.environ['GDRIVE_FILE_ID']
 
@@ -56,13 +61,17 @@ updated_df['Order.Date'] = pd.to_datetime(updated_df['Order.Date']).dt.strftime(
     '%Y-%m-%d'
 )
 
-# 5. Overwrite the updated dataframe back to Google Drive
+# 5. Upload updated CSV back to Google Drive
 temp_csv = 'updated_output.csv'
 updated_df.to_csv(temp_csv, index=False)
+
 media = MediaFileUpload(temp_csv, mimetype='text/csv', resumable=True)
 service.files().update(fileId=FILE_ID, media_body=media).execute()
 
+if os.path.exists(temp_csv):
+  os.remove(temp_csv)
+
 print(
-    f"Successfully added {num_new_orders} rows for"
+    f"Successfully updated Drive CSV for date:"
     f' {new_order_date.strftime("%Y-%m-%d")}'
 )
