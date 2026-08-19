@@ -2,20 +2,25 @@ import os
 import random
 from datetime import datetime, timedelta
 import pandas as pd
+import gdown
 
 # १. Google Drive File ID घेणे
 FILE_ID = os.environ['GDRIVE_FILE_ID']
 
-# २. Direct CSV Download URL द्वारे डेटा लोड करणे
-url = f"https://drive.google.com/uc?id={FILE_ID}&export=download"
-df = pd.read_csv(url)
+# २. gdown द्वारे फाईल डाऊनलोड करणे
+url = f'https://drive.google.com/uc?id={FILE_ID}'
+output = 'G_Superstore.csv'
+gdown.download(url, output, quiet=False)
 
-# ३. 'Order Date' कॉलम तारीख स्वरूपात बदलणे
+# ३. डाऊनलोड झालेली CSV फाईल वाचणे
+df = pd.read_csv(output)
+
+# ४. 'Order Date' तारीख स्वरूपात बदलणे
 df['Order Date'] = pd.to_datetime(df['Order Date'])
 last_date = df['Order Date'].max()
 next_date = last_date + timedelta(days=1)
 
-# ४. नवीन 15 ते 20 बनावट ऑर्डर्स तयार करणे
+# ५. नवीन ऑर्डर्स तयार करणे
 num_new_orders = random.randint(15, 20)
 new_rows = []
 
@@ -30,7 +35,7 @@ for _ in range(num_new_orders):
     sample_row['Profit'] = round(sample_row['Sales'] * random.uniform(0.1, 0.4), 2)
     new_rows.append(sample_row)
 
-# ५. नवीन डेटा जुन्या डेटामध्ये जोडणे आणि लोकल फाईल सेव्ह करणे
+# ६. अपडेटेड डेटा लोकल फाईलमध्ये सेव्ह करणे
 updated_df = pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
 updated_df.to_csv("G_Superstore.csv", index=False)
 
