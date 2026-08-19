@@ -3,7 +3,7 @@ name: Daily Superstore Data Update
 on:
  workflow_dispatch: # मॅन्युअली रन करण्यासाठी
  schedule:
-    - cron: '30 3 * * *' # दररोज सकाळी 9:00 AM IST (3:30 AM UTC)
+    - cron: '30 3 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
