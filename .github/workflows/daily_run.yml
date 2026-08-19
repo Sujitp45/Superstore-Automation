@@ -1,10 +1,9 @@
 name: Daily Superstore Data Update
 
 on:
-  schedule:
-    - cron: '0 18 * * *'  # Runs automatically every day at midnight IST
-  workflow_dispatch:      # Allows manual trigger button
-
+ workflow_dispatch: # मॅन्युअली रन करण्यासाठी
+ schedule:
+    - cron: '30 3 * * *' # दररोज सकाळी 9:00 AM IST (3:30 AM UTC)
 jobs:
   build:
     runs-on: ubuntu-latest
