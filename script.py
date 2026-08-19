@@ -20,7 +20,7 @@ service = build('drive', 'v3', credentials=creds)
 FILE_ID = os.environ['GDRIVE_FILE_ID']
 
 # 1. Download existing CSV file from Google Drive
-request = drive_service.files().export_media(
+request = service.files().export_media(
     fileId=FILE_ID, 
     mimeType='text/csv'
 )
